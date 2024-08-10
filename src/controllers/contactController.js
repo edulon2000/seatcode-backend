@@ -1,25 +1,24 @@
+// controllers/contactController.js
 const Contact = require('../models/Contact');
-
-const getContacts = async (req, res) => {
-  try {
-    const contacts = await Contact.find();
-    res.json(contacts);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 
 const createContact = async (req, res) => {
   try {
-    const newContact = new Contact(req.body);
-    const savedContact = await newContact.save();
-    res.status(201).json(savedContact);
+    const { name, email, phone, message } = req.body;
+
+    // Validar dados
+    if (!name || !email || !phone || !message) {
+      return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    }
+
+    // Criar novo contato
+    const newContact = new Contact({ name, email, phone, message });
+    await newContact.save();
+
+    res.status(201).json({ message: 'Contato salvo com sucesso!' });
   } catch (error) {
-    res.status(400).json({ message: 'Error creating contact' });
+    console.error(error);
+    res.status(500).json({ message: 'Erro ao salvar o contato' });
   }
 };
 
-module.exports = {
-  getContacts,
-  createContact,
-};
+module.exports = { createContact };
